@@ -20,7 +20,12 @@ export async function GET(request: Request) {
     return NextResponse.json(feedbacks, { status: 200 });
   } catch (error) {
     console.error('Error retrieving feedback:', error);
-    return NextResponse.json({ error: 'Failed to retrieve feedback', details: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to retrieve feedback', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'Failed to retrieve feedback', details: String(error) }, { status: 500 });
+    }
   }
 }
 
@@ -43,6 +48,11 @@ export async function POST(request: Request) {
     return NextResponse.json(insertedDocument, { status: 201 });
   } catch (error) {
     console.error('Error saving feedback:', error);
-    return NextResponse.json({ error: 'Failed to save feedback', details: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to save feedback', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'Failed to save feedback', details: String(error) }, { status: 500 });
+    }
   }
 }

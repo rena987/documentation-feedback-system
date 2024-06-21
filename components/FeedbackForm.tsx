@@ -2,23 +2,20 @@ import { useState } from 'react';
 
 interface FeedbackFormProps {
   docId: string;
+  onSubmit: (feedback: { rating: number; comment: string }) => Promise<void>;
 }
 
-export default function FeedbackForm({ docId }: FeedbackFormProps) {
-  const [feedback, setFeedback] = useState({ rating: '', comment: '' });
+export default function FeedbackForm({ docId, onSubmit }: FeedbackFormProps) {
+  const [feedback, setFeedback] = useState({ rating: 0, comment: '' });
   const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch('/api/feedback', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...feedback, docId }),
-    });
-    if (res.ok) {
+    try {
+      await onSubmit({ rating: feedback.rating, comment: feedback.comment });
       setMessage('Feedback submitted successfully');
-      setFeedback({ rating: '', comment: '' });
-    } else {
+      setFeedback({ rating: 0, comment: '' });
+    } catch (error) {
       setMessage('Failed to submit feedback');
     }
   };
@@ -29,12 +26,15 @@ export default function FeedbackForm({ docId }: FeedbackFormProps) {
         <label>Rating:</label>
         <select
           value={feedback.rating}
-          onChange={(e) => setFeedback({ ...feedback, rating: e.target.value })}
+          onChange={(e) => setFeedback({ ...feedback, rating: Number(e.target.value) })}
           className="border p-2 rounded"
         >
-          <option value="">Select</option>
-          <option value="like">Like</option>
-          <option value="dislike">Dislike</option>
+          <option value={0}>Select</option>
+          <option value={1}>1</option>
+          <option value={2}>2</option>
+          <option value={3}>3</option>
+          <option value={4}>4</option>
+          <option value={5}>5</option>
         </select>
       </div>
       <div>

@@ -9,7 +9,12 @@ export async function GET() {
     return NextResponse.json(snippets, { status: 200 });
   } catch (error) {
     console.error('Error retrieving snippets:', error);
-    return NextResponse.json({ error: 'Failed to retrieve snippets', details: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to retrieve snippets', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'Failed to retrieve snippets', details: String(error) }, { status: 500 });
+    }
   }
 }
 
@@ -32,6 +37,11 @@ export async function POST(request: Request) {
     return NextResponse.json(insertedDocument, { status: 201 });
   } catch (error) {
     console.error('Error saving snippet:', error);
-    return NextResponse.json({ error: 'Failed to save snippet', details: error.message }, { status: 500 });
+
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to save snippet', details: error.message }, { status: 500 });
+    } else {
+      return NextResponse.json({ error: 'Failed to save snippet', details: String(error) }, { status: 500 });
+    }
   }
 }

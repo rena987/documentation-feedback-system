@@ -20,6 +20,13 @@ const languages = [
   // Add more languages as needed
 ];
 
+interface CustomUser {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}
+
 export default function Doc() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -84,16 +91,18 @@ export default function Doc() {
       alert('Please sign in to save code snippets.');
       return;
     }
-  
+
+    const user = session.user as CustomUser;
+
     try {
       const response = await fetch('/api/snippets', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ docId: doc, code, language, userId: session.user.id }),
+        body: JSON.stringify({ docId: doc, code, language, userId: user.id }),
       });
-  
+
       if (response.ok) {
         alert('Code snippet saved successfully.');
       } else {
@@ -106,7 +115,6 @@ export default function Doc() {
       alert('Failed to save code snippet.');
     }
   };
-  
 
   const handleFeedbackSubmit = async (feedback: { rating: number; comment: string }) => {
     const response = await fetch('/api/feedback', {
@@ -154,7 +162,7 @@ export default function Doc() {
             <button onClick={() => signOut()} className="mb-4 bg-red-500 text-white p-2 rounded">
               Sign Out
             </button>
-            <p>Signed in as {session.user.email}</p>
+            <p>Signed in as {(session.user as CustomUser)?.email}</p>
           </>
         ) : (
           <button onClick={() => signIn('google', { callbackUrl: `/docs/${doc}` })} className="mb-4 bg-blue-500 text-white p-2 rounded">
